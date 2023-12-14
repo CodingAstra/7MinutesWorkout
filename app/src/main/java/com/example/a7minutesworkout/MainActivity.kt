@@ -1,9 +1,8 @@
 package com.example.a7minutesworkout
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.FrameLayout
-import android.widget.Toast
 import com.example.a7minutesworkout.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -16,17 +15,14 @@ class MainActivity : AppCompatActivity() {
 
        // val fLStartButton: FrameLayout = findViewById(R.id.flStart)
         binding?.flStart?.setOnClickListener {
-            Toast.makeText(
-                this@MainActivity,
-                "Here we will start the exercise.",
-                Toast.LENGTH_SHORT
-            ).show()
+            val intent = Intent(this,ExerciseActivity::class.java)
+            startActivity(intent)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        //Todo 4: TO avoid memory leak we unassign the binding once the activity is destroyed
+        //Todo 4: TO avoid memory leak we unassigned the binding once the activity is destroyed
         binding = null
     }
 }
