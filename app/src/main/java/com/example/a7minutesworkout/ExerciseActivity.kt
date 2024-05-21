@@ -1,5 +1,7 @@
 package com.example.a7minutesworkout
 
+import android.media.MediaPlayer
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -26,6 +28,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var currentExercisePosition = -1 // Current Position of Exercise.
     private var binding: ActivityExerciseBinding? = null
     private var tts: TextToSpeech? = null
+    private var player: MediaPlayer? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,6 +51,25 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     }
     private fun setupRestView() {
+
+        //  (Step 3 - Playing a notification sound when the exercise is about to start when you are in the rest state
+        //  the sound file is added in the raw folder as resource.)
+        // START
+        /**
+         * Here the sound file is added in to "raw" folder in resources.
+         * And played using MediaPlayer. MediaPlayer class can be used to control playback
+         * of audio/video files and streams.
+         */
+        try {
+            val soundURI =
+                Uri.parse("android.resource://com.example.a7minutesworkout/" + R.raw.start)
+            player = MediaPlayer.create(applicationContext, soundURI)
+            player?.isLooping = false // Sets the player to be looping or non-looping.
+            player?.start() // Starts Playback.
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        // END
 
         binding?.flRestView?.visibility = View.VISIBLE
         binding?.tvTitle?.visibility = View.VISIBLE
@@ -183,6 +205,12 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             tts!!.stop()
             tts!!.shutdown()
         }
+        //  (Step 4 - When the activity is destroyed if the media player instance is not null then stop it.)
+        // START
+        if(player != null){
+            player!!.stop()
+        }
+        // END
 
         super.onDestroy()
         binding = null
