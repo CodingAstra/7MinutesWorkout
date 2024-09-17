@@ -9,6 +9,7 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a7minutesworkout.databinding.ActivityExerciseBinding
 import java.util.Locale
 
@@ -29,6 +30,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var binding: ActivityExerciseBinding? = null
     private var tts: TextToSpeech? = null
     private var player: MediaPlayer? = null
+    private var excerciseAdapter: ExcerciseStatusAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,7 +50,15 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         // END
         tts = TextToSpeech(this, this)
         setupRestView()
+        setupExerciseStatusRecyclerView()
 
+    }
+
+    private fun setupExerciseStatusRecyclerView(){
+        binding?.rvExerciseStatus?.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false)
+
+        excerciseAdapter = ExcerciseStatusAdapter(exerciseList!!)
+        binding?.rvExerciseStatus?.adapter = excerciseAdapter
     }
     private fun setupRestView() {
 
@@ -151,6 +161,10 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             override fun onFinish() {
                 // When the 10 seconds will complete this will be executed.
                 currentExercisePosition++
+
+                exerciseList!![currentExercisePosition].setIsSelected(true)
+                excerciseAdapter!!.notifyDataSetChanged()
+
                 setupExerciseView()
             }
         }.start()
@@ -169,6 +183,11 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             }
 
             override fun onFinish() {
+
+                exerciseList!![currentExercisePosition].setIsSelected(false)
+                exerciseList!![currentExercisePosition].setIsCompleted(true)
+                excerciseAdapter!!.notifyDataSetChanged()
+
                 // TODO(Step 10 - Updating the view after completing the 30 seconds exercise.)
                 // START
                 if (currentExercisePosition < exerciseList?.size!! - 1) {
