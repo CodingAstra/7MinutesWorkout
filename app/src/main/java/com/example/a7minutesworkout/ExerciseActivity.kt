@@ -1,5 +1,6 @@
 package com.example.a7minutesworkout
 
+import android.app.Dialog
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
@@ -11,6 +12,7 @@ import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a7minutesworkout.databinding.ActivityExerciseBinding
+import com.example.a7minutesworkout.databinding.DialogCustomBackConfirmationBinding
 import java.util.Locale
 
 class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
@@ -30,19 +32,20 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var binding: ActivityExerciseBinding? = null
     private var tts: TextToSpeech? = null
     private var player: MediaPlayer? = null
-    private var excerciseAdapter: ExcerciseStatusAdapter? = null
+    private var exerciseAdapter: ExcerciseStatusAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityExerciseBinding.inflate(layoutInflater)
         setContentView(binding?.root)
-        setSupportActionBar(binding?.toolbarExercise)
 
+
+        setSupportActionBar(binding?.toolbarExercise)
         if (supportActionBar != null){
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
         binding?.toolbarExercise?.setNavigationOnClickListener {
-            onBackPressed()
+            customDialogForBackButton()
         }
         // TODO(Step 7 - Initializing and Assigning a default exercise list to our list variable.)
         // START
@@ -51,14 +54,32 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         tts = TextToSpeech(this, this)
         setupRestView()
         setupExerciseStatusRecyclerView()
+    }
 
+    @Suppress("MissingSuperCall")
+    override fun onBackPressed() {
+        customDialogForBackButton()
+    }
+    private fun customDialogForBackButton(){
+        val customDialog = Dialog(this)
+        val dialogBinding = DialogCustomBackConfirmationBinding.inflate(layoutInflater)
+        customDialog.setContentView(dialogBinding.root)
+        customDialog.setCancelable(false)
+        dialogBinding.btnYes.setOnClickListener {
+            this@ExerciseActivity.finish()
+            customDialog.dismiss()
+        }
+        dialogBinding.btnNo.setOnClickListener {
+            customDialog.dismiss()
+        }
+        customDialog.show()
     }
 
     private fun setupExerciseStatusRecyclerView(){
         binding?.rvExerciseStatus?.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false)
 
-        excerciseAdapter = ExcerciseStatusAdapter(exerciseList!!)
-        binding?.rvExerciseStatus?.adapter = excerciseAdapter
+        exerciseAdapter = ExcerciseStatusAdapter(exerciseList!!)
+        binding?.rvExerciseStatus?.adapter = exerciseAdapter
     }
     private fun setupRestView() {
 
@@ -72,7 +93,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
          */
         try {
             val soundURI =
-                Uri.parse("android.resource://com.example.a7minutesworkout/" + R.raw.start)
+                Uri.parse("android.resource://com.example.a7minutesWorkout/" + R.raw.start)
             player = MediaPlayer.create(applicationContext, soundURI)
             player?.isLooping = false // Sets the player to be looping or non-looping.
             player?.start() // Starts Playback.
@@ -163,7 +184,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 currentExercisePosition++
 
                 exerciseList!![currentExercisePosition].setIsSelected(true)
-                excerciseAdapter!!.notifyDataSetChanged()
+                exerciseAdapter!!.notifyDataSetChanged()
 
                 setupExerciseView()
             }
@@ -189,7 +210,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 if (currentExercisePosition < exerciseList?.size!! - 1) {
                     exerciseList!![currentExercisePosition].setIsSelected(false)
                     exerciseList!![currentExercisePosition].setIsCompleted(true)
-                    excerciseAdapter!!.notifyDataSetChanged()
+                    exerciseAdapter!!.notifyDataSetChanged()
                     setupRestView()
                 } else {
                     finish()
